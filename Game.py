@@ -24,8 +24,6 @@ class Game:
         # taille de la fenetre
         self.largeur_plateau: int = largeur-100
         self.hauteur_plateau: int = hauteur-50
-        self.largeur_case: int = self.largeur_plateau/10
-        self.hauteur_case: int = self.hauteur_plateau/8
 
         # creation de la surface de jeu du plateau
         self.plateau = pygame.Surface(
@@ -37,10 +35,7 @@ class Game:
         # creation du damier de jeu
         self.damier = Damier.Damier()
 
-        # creation de la police d'ecriture pour le menu
-        self.font = pygame.font.SysFont("comicsansms", 30)
-
-    def Menu(self: Game) -> bool:
+    def Menu(self: Game) -> None:
         # dessin du titre et ajout au menu
         titre: pygame.Surface = pygame.image.load("./assets/images/titre.png")
         titre = pygame.transform.scale(titre, (700, 77))
@@ -49,8 +44,21 @@ class Game:
         # dessin bouton jouer et ajout au menu
         jouer: pygame.Rect = pygame.Rect(100, 150, 500, 100)
         pygame.draw.rect(self.menu, (0, 0, 0, 150), jouer)
-        text: pygame.Surface = self.font.render("Jouer", True, (255, 255, 255))
-        self.menu.blit(text, (100, 0))
+
+        font: pygame.font.Font = pygame.font.SysFont("comicsansms", 72)
+        text: pygame.Surface = font.render("Jouer", True, (255, 255, 255))
+        text_rect: pygame.Rect = text.get_rect()
+        self.menu.blit(text, (jouer.centerx - text_rect.width /
+                              2, jouer.centery - text_rect.height/2))
+
+        # dessin bouton crédit et ajout au menu
+        credit: pygame.Rect = pygame.Rect(100, 300, 500, 100)
+        pygame.draw.rect(self.menu, (0, 0, 0, 150), credit)
+
+        text: pygame.Surface = font.render("Crédits", True, (255, 255, 255))
+        text_rect: pygame.Rect = text.get_rect()
+        self.menu.blit(text, (credit.centerx - text_rect.width /
+                              2, credit.centery - text_rect.height/2))
 
         # affichage du menu
         position: tuple = ((self.largeur_fenetre /
@@ -75,7 +83,7 @@ class Game:
 
         pygame.quit()
 
-    def drawCase(self, x: int, y: int):
+    def drawCase(self, largeur_case, hauteur_case, x: int, y: int):
         '''Dessine une case blanche avec des coins arrondis, aux coordonnées x et y
 
         Args:
@@ -88,18 +96,18 @@ class Game:
         color: tuple = (255, 255, 255, 100)
         radius: int = 25
         surface: pygame.Surface = pygame.Surface(
-            (self.largeur_case, self.hauteur_case), pygame.SRCALPHA)
+            (largeur_case, hauteur_case), pygame.SRCALPHA)
 
         # Dessiner la case avec un padding de 2px
         # Dessiner les coins arrondis
-        for corner in [(2+radius, 2+radius), (self.largeur_case-radius-2, 2+radius), (self.largeur_case-radius-2, self.hauteur_case-radius-2), (2+radius, self.hauteur_case-radius-2)]:
+        for corner in [(2+radius, 2+radius), (largeur_case-radius-2, 2+radius), (largeur_case-radius-2, hauteur_case-radius-2), (2+radius, hauteur_case-radius-2)]:
             pygame.draw.circle(surface, color, corner, radius)
 
         # Dessiner les côtés
         pygame.draw.rect(surface, color, pygame.Rect(
-            radius+2, 2, self.largeur_case - 2 * radius-4, self.hauteur_case-4))
+            radius+2, 2, largeur_case - 2 * radius-4, hauteur_case-4))
         pygame.draw.rect(surface, color, pygame.Rect(
-            2, radius+2, self.largeur_case-4, self.hauteur_case - 2 * radius-4))
+            2, radius+2, largeur_case-4, hauteur_case - 2 * radius-4))
 
         # ajouter la surface à la fenetre
         self.plateau.blit(surface, (x, y))
@@ -111,8 +119,11 @@ class Game:
     #     self.fenetre.blit(text, (x, y))
 
     def drawPlateau(self):
-        for i in range(10):
-            for j in range(8):
-                self.drawCase(i*self.largeur_case, j*self.hauteur_case)
+        largeur_case = self.largeur_plateau/12
+        hauteur_case = self.hauteur_plateau/10
+        for i in range(12):
+            for j in range(10):
+                self.drawCase(largeur_case, hauteur_case,
+                              i*largeur_case, j*hauteur_case)
         self.buffer.blit(self.plateau, (50, 25))
         pygame.display.update()
