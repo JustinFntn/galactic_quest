@@ -14,6 +14,9 @@ class Game:
             (largeur, hauteur), pygame.SRCALPHA)
         pygame.display.set_caption("JEU")
 
+        # horloge du jeu
+        self.clock: pygame.time.Clock = pygame.time.Clock()
+
         # chargement de l'image de fond
         self.background: pygame.Surface = pygame.image.load(
             "./assets/images/background.jpg")
@@ -35,15 +38,25 @@ class Game:
         # creation du damier de jeu
         self.damier = Damier.Damier()
 
-    def Menu(self: Game) -> None:
+    def Menu(self: Game, mouse_pos: tuple, event: pygame.event) -> bool:
+        self.buffer.blit(self.background, (0, 0))
+        start: bool = False
+
+        # position du menu
+        position: tuple = ((self.largeur_fenetre /
+                            2-350, self.hauteur_fenetre/2-250))
+
         # dessin du titre et ajout au menu
         titre: pygame.Surface = pygame.image.load("./assets/images/titre.png")
         titre = pygame.transform.scale(titre, (700, 77))
         self.menu.blit(titre, (0, 0))
 
-        # dessin bouton jouer et ajout au menu
+        # dessin bouton jouer et ajout au menu avec la couleur de fond
         jouer: pygame.Rect = pygame.Rect(100, 150, 500, 100)
-        pygame.draw.rect(self.menu, (0, 0, 0, 150), jouer)
+        if jouer.collidepoint(mouse_pos[0]-position[0], mouse_pos[1]-position[1]):
+            pygame.draw.rect(self.menu, (0, 0, 204, 150), jouer)
+        else:
+            pygame.draw.rect(self.menu, (0, 0, 0, 150), jouer)
 
         font: pygame.font.Font = pygame.font.SysFont("comicsansms", 72)
         text: pygame.Surface = font.render("Jouer", True, (255, 255, 255))
@@ -53,33 +66,42 @@ class Game:
 
         # dessin bouton crédit et ajout au menu
         credit: pygame.Rect = pygame.Rect(100, 300, 500, 100)
-        pygame.draw.rect(self.menu, (0, 0, 0, 150), credit)
+        if credit.collidepoint(mouse_pos[0]-position[0], mouse_pos[1]-position[1]):
+            pygame.draw.rect(self.menu, (0, 0, 204, 150), credit)
+        else:
+            pygame.draw.rect(self.menu, (0, 0, 0, 150), credit)
 
         text: pygame.Surface = font.render("Crédits", True, (255, 255, 255))
         text_rect: pygame.Rect = text.get_rect()
         self.menu.blit(text, (credit.centerx - text_rect.width /
                               2, credit.centery - text_rect.height/2))
 
-        # affichage du menu
-        position: tuple = ((self.largeur_fenetre /
-                            2-350, self.hauteur_fenetre/2-250))
+        # dessin du menu
         self.buffer.blit(self.menu, position)
-        pygame.display.update((position, (500, 500)))
-        return True
+
+        return start
 
     def run(self):
-        clock = pygame.time.Clock()
-        clock.tick(20)
-
+        start: bool = False
+        mouse_pos: tuple = (0, 0)
         pygame.display.update(self.buffer.get_rect())
         # self.drawPlateau()
-        self.Menu()
 
         running = True
         while running:
+            mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+
+                if not start:
+                    start = self.Menu(mouse_pos, event)
+                else:
+                    self.drawPlateau()
+
+            self.clock.tick(20)
+
+            pygame.display.update()
 
         pygame.quit()
 
