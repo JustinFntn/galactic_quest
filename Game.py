@@ -1,6 +1,11 @@
 from __future__ import annotations
+import logging
+import logging.config
 import pygame
+
 import Damier
+
+logging.config.fileConfig('./conf/log-config.ini')
 
 
 class Game:
@@ -37,6 +42,8 @@ class Game:
 
         # creation du damier de jeu
         self.damier = Damier.Damier()
+
+        logging.info("Initialisation du damier de jeu")
 
     def Menu(self: Game, mouse_pos: tuple, event: pygame.event) -> bool:
         self.buffer.blit(self.background, (0, 0))
