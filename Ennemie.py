@@ -1,9 +1,9 @@
 from __future__ import annotations
-import Entité
+from Entite import Entite
 
 
-class Ennemie(Entité):
-    def __init__(self: Ennemie, nom: str) -> None:
+class Ennemie(Entite):
+    def __init__(self: Ennemie, nom: str = "default") -> None:
         super().__init__(nom)
 
 

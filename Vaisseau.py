@@ -1,10 +1,10 @@
-import Entité
+from __future__ import annotations
+from Entite import Entite
 
 
-class Vaisseau(Entité):
-    def __init__(self, nom: str, couleur: str) -> None:
-        super().__init__(nom)
-        self._couleur = couleur
+class Vaisseau(Entite):
+    def __init__(self: Vaisseau, url: str = None, nom: str = "joueur") -> None:
+        super().__init__(url, nom)
 
     def getcouleur(self):
         return self._couleur

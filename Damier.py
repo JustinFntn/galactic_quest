@@ -1,11 +1,24 @@
-# import Vaisseau
+# standard library
+from __future__ import annotations
+import logging
+import logging.config
+
+# third-party library
+import pygame
+
+# local library
+from Vaisseau import Vaisseau
+from Ennemie import Ennemie
 
 
 class Damier:
     def __init__(self) -> None:
-        self._cases: list(list(dict)) = [[{'test': 0}
-                                          for i in range(8)] for j in range(10)]
-        self._vaisseaux: list() = []
+        self._cases: list(list(dict)) = [[dict()
+                                          for _ in range(12)] for _ in range(10)]
+        self._vaisseaux: list(Vaisseau) = []
+        self._ennemies: list(Ennemie) = []
+
+        logging.info("damier initialisé")
 
     def deplacement(self):
         pass
