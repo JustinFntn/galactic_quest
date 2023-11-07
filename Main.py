@@ -4,7 +4,7 @@ import logging.config
 
 # third-party library
 import pygame
-from AppKit import NSScreen, NSApplication, NSApp
+# from AppKit import NSScreen, NSApplication, NSApp
 
 # local library
 from Game import Game
@@ -14,7 +14,6 @@ logging.config.fileConfig('./conf/log-config.ini')
 
 if __name__ == '__main__':
     pygame.init()
-    pygame.mixer.init()
 
     screen_info = pygame.display.Info()
     dock_size = 150
@@ -30,8 +29,9 @@ if __name__ == '__main__':
     while running:
         if game.is_played:
             game.drawPlateau(screen)
+            game.play_menu_in_game(screen)
         elif game.is_credit:
-            game.show_credit(screen)
+            game.play_credit(screen)
         else:
             game.play_menu(screen)
 
@@ -39,7 +39,7 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
 
-        clock.tick(60)
+        clock.tick(40)
 
         pygame.display.update()
 

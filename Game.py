@@ -52,7 +52,7 @@ class Game:
             None
         """
         # song
-        pygame.mixer.music.load("./assets/sounds/lazer-sfx.mp3")
+        sound = pygame.mixer.Sound("./assets/sounds/lazer-sfx.mp3")
         # dessin du fond
         screen.blit(self.background, (0, 0))
 
@@ -73,9 +73,9 @@ class Game:
         # dessin bouton jouer et ajout au menu avec la couleur de fond
         self.jouer: pygame.Rect = pygame.Rect(100, 150, 500, 100)
         if self.jouer.collidepoint(mouse_pos[0]-position[0], mouse_pos[1]-position[1]):
-            pygame.mixer.music.play()
             pygame.draw.rect(menu, (0, 0, 204, 150), self.jouer)
             if pygame.mouse.get_pressed()[0]:
+                sound.play()
                 self.is_played = True
         else:
             pygame.draw.rect(menu, (0, 0, 0, 150), self.jouer)
@@ -152,8 +152,24 @@ class Game:
 
         screen.blit(self.plateau, (10, 10))
 
-    def show_credit(self, screen: pygame.Surface):
+    def play_credit(self, screen: pygame.Surface):
         self.drawPlateau(screen)
+
+    def play_menu_in_game(self, screen: pygame.Surface):
+        largeur: int = self.largeur_fenetre-self.largeur_plateau-30
+        hauteur: int = self.hauteur_plateau
+
+        menu: pygame.Surface = pygame.Surface(
+            (largeur, hauteur), pygame.SRCALPHA)
+        pygame.draw.rect(menu, (100, 100, 100, 150), pygame.Rect(
+            0, 0, largeur, hauteur), border_top_left_radius=20, border_top_right_radius=20)
+
+        titre: pygame.Surface = pygame.image.load("./assets/images/titre.png")
+        titre = pygame.transform.scale(
+            titre, (largeur-15, (largeur-15)*0.11))
+        menu.blit(titre, (7.5, 15))
+
+        screen.blit(menu, (self.largeur_plateau+20, 10))
 
     def __str__(self: Game) -> str:
         json: str = "{\n"
