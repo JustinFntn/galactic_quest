@@ -2,6 +2,7 @@
 from __future__ import annotations
 import logging
 import logging.config
+import time
 
 # third-party library
 import pygame
@@ -51,8 +52,6 @@ class Game:
         Returns:
             None
         """
-        # song
-        sound = pygame.mixer.Sound("./assets/sounds/lazer-sfx.mp3")
         # dessin du fond
         screen.blit(self.background, (0, 0))
 
@@ -70,15 +69,18 @@ class Game:
         titre = pygame.transform.scale(titre, (700, 77))
         menu.blit(titre, (0, 0))
 
-        # dessin bouton jouer et ajout au menu avec la couleur de fond
+        # dessin bouton jouer et ajout au menu (avec gestion des événements)
         self.jouer: pygame.Rect = pygame.Rect(100, 150, 500, 100)
         if self.jouer.collidepoint(mouse_pos[0]-position[0], mouse_pos[1]-position[1]):
-            pygame.draw.rect(menu, (0, 0, 204, 150), self.jouer)
+            pygame.draw.rect(menu, (0, 0, 204, 150),
+                             self.jouer, border_radius=10)
             if pygame.mouse.get_pressed()[0]:
-                sound.play()
+                pygame.mixer.Sound("./assets/sounds/lazer-sfx.mp3").play()
                 self.is_played = True
+                time.sleep(0.1)
         else:
-            pygame.draw.rect(menu, (0, 0, 0, 150), self.jouer)
+            pygame.draw.rect(menu, (0, 0, 0, 150), self.jouer,
+                             border_radius=10)
 
         font: pygame.font.Font = pygame.font.SysFont("comicsansms", 72)
         text: pygame.Surface = font.render("Jouer", True, (255, 255, 255))
@@ -86,14 +88,14 @@ class Game:
         menu.blit(text, (self.jouer.centerx - text_rect.width /
                          2, self.jouer.centery - text_rect.height/2))
 
-        # dessin bouton crédit et ajout au menu
+        # dessin bouton crédits et ajout au menu (avec gestion des événements)
         credit: pygame.Rect = pygame.Rect(100, 300, 500, 100)
         if credit.collidepoint(mouse_pos[0]-position[0], mouse_pos[1]-position[1]):
-            pygame.draw.rect(menu, (0, 0, 204, 150), credit)
+            pygame.draw.rect(menu, (0, 0, 204, 150), credit, border_radius=10)
             if pygame.mouse.get_pressed()[0]:
                 self.is_credit = True
         else:
-            pygame.draw.rect(menu, (0, 0, 0, 150), credit)
+            pygame.draw.rect(menu, (0, 0, 0, 150), credit, border_radius=10)
 
         text: pygame.Surface = font.render("Crédits", True, (255, 255, 255))
         text_rect: pygame.Rect = text.get_rect()
@@ -103,27 +105,28 @@ class Game:
         # dessin du menu
         screen.blit(menu, position)
 
-    def drawCase(self, largeur_case, hauteur_case):
-        '''Dessine une case blanche avec des coins arrondis, aux coordonnées x et y
+    def draw_case(self: Game, largeur_case: int, hauteur_case: int) -> pygame.Surface:
+        '''Dessine une case avec coins arrondis et retourne la surface pygame correspondante.
 
         Args:
-            x (int): abscisse de la case
-            y (int): ordonnée de la case
+            self (Game): Instance de la classe Game.
+            largeur_case (int): Largeur de la case à dessiner.
+            hauteur_case (int): Hauteur de la case à dessiner.
 
         Returns:
-            pygame.surface: la surface où est dessinée la case
+            pygame.Surface: Surface pygame correspondant à la case dessinée.
         '''
         color: tuple = (255, 255, 255, 75)
-        radius: int = 25
+        radius: int = 25 if largeur_case > 50 else 0
         surface: pygame.Surface = pygame.Surface(
             (largeur_case, hauteur_case), pygame.SRCALPHA)
 
         # Dessiner la case avec le padding
-        # Dessiner les coins arrondis
+        # 1ere étape les coins arrondis
         for corner in [(2+radius, 2+radius), (largeur_case-radius-2, 2+radius), (largeur_case-radius-2, hauteur_case-radius-2), (2+radius, hauteur_case-radius-2)]:
             pygame.draw.circle(surface, color, corner, radius)
 
-        # Dessiner les côtés
+        # 2eme étapes les côtés
         pygame.draw.rect(surface, color, pygame.Rect(
             radius+2, 2, largeur_case - 2 * radius-4, hauteur_case-4))
         pygame.draw.rect(surface, color, pygame.Rect(
@@ -135,7 +138,7 @@ class Game:
     #     text = self.font.render(texte, True, couleur)
     #     self.fenetre.blit(text, (x, y))
 
-    def drawPlateau(self, screen: pygame.Surface):
+    def draw_plateau(self, screen: pygame.Surface):
         screen.blit(self.background, (0, 0))
 
         # creation de la surface de jeu du plateau
@@ -144,16 +147,16 @@ class Game:
 
         largeur_case = self.largeur_plateau/12
         hauteur_case = self.hauteur_plateau/10
+        case: pygame.surface.Surface = self.draw_case(
+            largeur_case, hauteur_case)
         for i in range(12):
             for j in range(10):
-                case: pygame.surface.Surface = self.drawCase(
-                    largeur_case, hauteur_case)
                 self.plateau.blit(case, (i*largeur_case, j*hauteur_case))
 
         screen.blit(self.plateau, (10, 10))
 
     def play_credit(self, screen: pygame.Surface):
-        self.drawPlateau(screen)
+        self.draw_plateau(screen)
 
     def play_menu_in_game(self, screen: pygame.Surface):
         largeur: int = self.largeur_fenetre-self.largeur_plateau-30
@@ -161,7 +164,7 @@ class Game:
 
         menu: pygame.Surface = pygame.Surface(
             (largeur, hauteur), pygame.SRCALPHA)
-        pygame.draw.rect(menu, (100, 100, 100, 150), pygame.Rect(
+        pygame.draw.rect(menu, (100, 100, 100, 85), pygame.Rect(
             0, 0, largeur, hauteur), border_top_left_radius=20, border_top_right_radius=20)
 
         titre: pygame.Surface = pygame.image.load("./assets/images/titre.png")

@@ -28,7 +28,7 @@ if __name__ == '__main__':
     running = True
     while running:
         if game.is_played:
-            game.drawPlateau(screen)
+            game.draw_plateau(screen)
             game.play_menu_in_game(screen)
         elif game.is_credit:
             game.play_credit(screen)
@@ -38,6 +38,11 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            # echap pour revenir au menu principal
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game.is_played = False
+                    game.is_credit = False
 
         clock.tick(40)
 
