@@ -1,6 +1,4 @@
 # standard library
-import logging
-import logging.config
 
 # third-party library
 from pygame import sprite, image, rect, surface

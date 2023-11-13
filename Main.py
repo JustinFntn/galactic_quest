@@ -1,5 +1,4 @@
 # standard library
-import logging
 import logging.config
 
 # third-party library
@@ -28,8 +27,9 @@ if __name__ == '__main__':
     running = True
     while running:
         if game.is_played:
-            game.draw_plateau(screen)
-            game.play_menu_in_game(screen)
+            # game.play_plateau(screen)
+            # game.play_menu_in_game(screen)
+            game.creer_joueur(screen)
         elif game.is_credit:
             game.play_credit(screen)
         else:

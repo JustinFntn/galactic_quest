@@ -1,6 +1,5 @@
 # standard library
 from __future__ import annotations
-import logging
 import logging.config
 import time
 
@@ -9,8 +8,6 @@ import pygame
 
 # local library
 from Damier import Damier
-
-logging.config.fileConfig('./conf/log-config.ini')
 
 
 class Game:
@@ -70,23 +67,23 @@ class Game:
         menu.blit(titre, (0, 0))
 
         # dessin bouton jouer et ajout au menu (avec gestion des événements)
-        self.jouer: pygame.Rect = pygame.Rect(100, 150, 500, 100)
-        if self.jouer.collidepoint(mouse_pos[0]-position[0], mouse_pos[1]-position[1]):
+        play_button: pygame.Rect = pygame.Rect(100, 150, 500, 100)
+        if play_button.collidepoint(mouse_pos[0]-position[0], mouse_pos[1]-position[1]):
             pygame.draw.rect(menu, (0, 0, 204, 150),
-                             self.jouer, border_radius=10)
+                             play_button, border_radius=10)
             if pygame.mouse.get_pressed()[0]:
                 pygame.mixer.Sound("./assets/sounds/lazer-sfx.mp3").play()
                 self.is_played = True
                 time.sleep(0.1)
         else:
-            pygame.draw.rect(menu, (0, 0, 0, 150), self.jouer,
+            pygame.draw.rect(menu, (0, 0, 0, 150), play_button,
                              border_radius=10)
 
         font: pygame.font.Font = pygame.font.SysFont("comicsansms", 72)
         text: pygame.Surface = font.render("Jouer", True, (255, 255, 255))
         text_rect: pygame.Rect = text.get_rect()
-        menu.blit(text, (self.jouer.centerx - text_rect.width /
-                         2, self.jouer.centery - text_rect.height/2))
+        menu.blit(text, (play_button.centerx - text_rect.width /
+                         2, play_button.centery - text_rect.height/2))
 
         # dessin bouton crédits et ajout au menu (avec gestion des événements)
         credit: pygame.Rect = pygame.Rect(100, 300, 500, 100)
@@ -103,6 +100,44 @@ class Game:
                          2, credit.centery - text_rect.height/2))
 
         # dessin du menu
+        screen.blit(menu, position)
+
+    def creer_joueur(self: Game, screen: pygame.Surface) -> int:
+        '''affiche les boutton pour la création des joueurs et retourne le nombre de joueur.
+
+        args:
+            self (Game): Instance de la classe Game.
+
+        returns:
+            int: nombre de joueur.
+        '''
+        # dessin du fond
+        screen.blit(self.background, (0, 0))
+
+        mouse_pos: tuple = pygame.mouse.get_pos()
+
+        # position du menu
+        position: tuple = ((self.largeur_fenetre /
+                            2-350, self.hauteur_fenetre/2-250))
+
+        # creation de la surface du menu
+        menu = pygame.Surface((700, 500), pygame.SRCALPHA)
+
+        buttons: list(pygame.Rect) = [
+            pygame.Rect(0, 0, 300, 150),
+            pygame.Rect(0, 350, 300, 150),
+            pygame.Rect(400, 0, 300, 150),
+            pygame.Rect(400, 350, 300, 150)
+        ]
+
+        for button in buttons:
+            if button.collidepoint(mouse_pos[0]-position[0], mouse_pos[1]-position[1]):
+                pygame.draw.rect(menu, (0, 0, 204, 150),
+                                 button, border_radius=10)
+            else:
+                pygame.draw.rect(menu, (0, 0, 0, 150),
+                                 button, border_radius=10)
+
         screen.blit(menu, position)
 
     def draw_case(self: Game, largeur_case: int, hauteur_case: int) -> pygame.Surface:
@@ -138,7 +173,7 @@ class Game:
     #     text = self.font.render(texte, True, couleur)
     #     self.fenetre.blit(text, (x, y))
 
-    def draw_plateau(self, screen: pygame.Surface):
+    def play_plateau(self, screen: pygame.Surface):
         screen.blit(self.background, (0, 0))
 
         # creation de la surface de jeu du plateau
@@ -156,7 +191,7 @@ class Game:
         screen.blit(self.plateau, (10, 10))
 
     def play_credit(self, screen: pygame.Surface):
-        self.draw_plateau(screen)
+        self.play_plateau(screen)
 
     def play_menu_in_game(self, screen: pygame.Surface):
         largeur: int = self.largeur_fenetre-self.largeur_plateau-30
