@@ -124,10 +124,10 @@ class Game:
         menu = pygame.Surface((700, 500), pygame.SRCALPHA)
 
         buttons: list(pygame.Rect) = [
-            pygame.Rect(0, 0, 300, 150),
-            pygame.Rect(0, 350, 300, 150),
-            pygame.Rect(400, 0, 300, 150),
-            pygame.Rect(400, 350, 300, 150)
+            pygame.Rect(0, 50, 300, 150),
+            pygame.Rect(0, 300, 300, 150),
+            pygame.Rect(400, 50, 300, 150),
+            pygame.Rect(400, 300, 300, 150)
         ]
 
         for button in buttons:
