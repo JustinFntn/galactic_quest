@@ -14,18 +14,23 @@ class Damier:
     def __init__(self) -> None:
         self._cases: list(list(dict)) = [[dict()
                                           for i in range(12)] for j in range(10)]
-        vaisseau: Vaisseau = Vaisseau(
-            "./assets/images/VaisseauRouge.png", "Justin")
-        self._vaisseaux: list(Vaisseau) = [vaisseau]
+        self._vaisseaux: list(Vaisseau) = []
         self._ennemies: list(Ennemie) = []
 
         logging.info("damier initialisé")
 
+    def get_size(self) -> tuple:
+        return (len(self._cases), len(self._cases[0]))
+
+    def set_vaisseau(self, number: int) -> None:
+        colors: list(str) = ["Rouge", "Bleu", "Vert", "Blanc"]
+        for i in range(number):
+            self._vaisseaux.append(Vaisseau(
+                "./assets/images/Vaisseau" + colors[i] + ".png"))
+            logging.info("vaisseau " + colors[i] + " créé")
+
     def deplacement(self):
         pass
-
-    def getSize(self) -> tuple:
-        return (len(self._cases), len(self._cases[0]))
 
     def __str__(self) -> str:
         texte: str = "[\n"

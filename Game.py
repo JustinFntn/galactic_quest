@@ -29,11 +29,15 @@ class Game:
         self.largeur_plateau: int = self.largeur_fenetre-300
         self.hauteur_plateau: int = self.hauteur_fenetre-20
 
+        # nombre de joueur
+        self.nb_joueur: int = 0
+
         # creation du damier de jeu
         self.damier = Damier()
 
         # variable d'état du jeu (peut-être à mettre sous forme d'enum)
         self.is_played: bool = False
+        self.is_joueur_set: bool = False
         self.is_credit: bool = False
 
         logging.info("jeu initialisé")
@@ -73,7 +77,7 @@ class Game:
                              play_button, border_radius=10)
             if pygame.mouse.get_pressed()[0]:
                 pygame.mixer.Sound("./assets/sounds/lazer-sfx.mp3").play()
-                self.is_played = True
+                self.is_joueur_set = True
                 time.sleep(0.1)
         else:
             pygame.draw.rect(menu, (0, 0, 0, 150), play_button,
@@ -102,7 +106,7 @@ class Game:
         # dessin du menu
         screen.blit(menu, position)
 
-    def creer_joueur(self: Game, screen: pygame.Surface) -> int:
+    def play_set_nb_joueur(self: Game, screen: pygame.Surface) -> None:
         '''affiche les boutton pour la création des joueurs et retourne le nombre de joueur.
 
         args:
@@ -125,18 +129,34 @@ class Game:
 
         buttons: list(pygame.Rect) = [
             pygame.Rect(0, 50, 300, 150),
-            pygame.Rect(0, 300, 300, 150),
             pygame.Rect(400, 50, 300, 150),
+            pygame.Rect(0, 300, 300, 150),
             pygame.Rect(400, 300, 300, 150)
         ]
 
-        for button in buttons:
+        font: pygame.font.Font = pygame.font.SysFont("comicsansms", 60)
+        for i, button in enumerate(buttons):
             if button.collidepoint(mouse_pos[0]-position[0], mouse_pos[1]-position[1]):
                 pygame.draw.rect(menu, (0, 0, 204, 150),
                                  button, border_radius=10)
+                if pygame.mouse.get_pressed()[0]:
+                    pygame.mixer.Sound("./assets/sounds/lazer-sfx.mp3").play()
+                    self.is_played = True
+                    self.nb_joueur = i+1
+                    time.sleep(0.1)
+                    return
             else:
                 pygame.draw.rect(menu, (0, 0, 0, 150),
                                  button, border_radius=10)
+            if i == 0:
+                text: pygame.Surface = font.render(
+                    "1 Joueur", True, (255, 255, 255))
+            else:
+                text: pygame.Surface = font.render(
+                    str(i+1)+" Joueurs", True, (255, 255, 255))
+            text_rect: pygame.Rect = text.get_rect()
+            menu.blit(text, (button.centerx - text_rect.width /
+                      2, button.centery - text_rect.height/2))
 
         screen.blit(menu, position)
 
@@ -186,7 +206,12 @@ class Game:
             largeur_case, hauteur_case)
         for i in range(12):
             for j in range(10):
-                self.plateau.blit(case, (i*largeur_case, j*hauteur_case))
+                for vaisseau in self.damier._vaisseaux:
+                    if vaisseau.pos == (i, j):
+                        pass
+                    else:
+                        self.plateau.blit(
+                            case, (i*largeur_case, j*hauteur_case))
 
         screen.blit(self.plateau, (10, 10))
 
