@@ -23,6 +23,15 @@ class Damier:
         return (len(self._cases), len(self._cases[0]))
 
     def set_vaisseau(self, number: int) -> None:
+        """
+        Add a number of Vaisseau to the damier.
+
+        Args:
+            number (int): The number of Vaisseau to add.
+
+        Returns:
+            None
+        """
         colors: list(str) = ["Rouge", "Bleu", "Vert", "Blanc"]
         for i in range(number):
             self._vaisseaux.append(Vaisseau(

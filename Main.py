@@ -48,6 +48,7 @@ if __name__ == '__main__':
                     game.is_played = False
                     game.is_credit = False
                     game.is_joueur_set = False
+                    game.damier = Game.damier()
 
         clock.tick(40)
 
