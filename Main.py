@@ -60,7 +60,7 @@ if __name__ == '__main__':
                     if event.key == pygame.K_a:
                         game.damier._vaisseaux[game.tour_joueur].pointlife -= 10 if game.damier._vaisseaux[game.tour_joueur].pointlife > 0 else 0
                     if event.key == pygame.K_z:
-                        game.damier._vaisseaux[game.tour_joueur].pointlife += 10 if game.damier._vaisseaux[game.tour_joueur].pointlife <= 90 else 100
+                        game.damier._vaisseaux[game.tour_joueur].pointlife += 10 if game.damier._vaisseaux[game.tour_joueur].pointlife <= 90 else 0
                     if event.key == pygame.K_RIGHT:
                         game.damier._vaisseaux[game.tour_joueur].pos[0] = game.damier._vaisseaux[game.tour_joueur].pos[0] + \
                             1 if game.damier._vaisseaux[game.tour_joueur].pos[0] < 11 else 0
