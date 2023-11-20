@@ -8,10 +8,17 @@ import pygame
 
 # local library
 from Damier import Damier
+from Vaisseau import Vaisseau
 
 
 class Game:
     def __init__(self: Game, screen: pygame.Surface) -> None:
+        '''Constructeur de la classe Game.
+
+        Args:
+            self (Game): Instance de la classe Game.
+            screen (pygame.Surface): Surface sur laquelle le jeu sera affiché.
+        '''
         # taille de l'écran d'affichage
         self.largeur_fenetre: int = screen.get_width()
         self.hauteur_fenetre: int = screen.get_height()
@@ -39,6 +46,10 @@ class Game:
         self.is_played: bool = False
         self.is_joueur_set: bool = False
         self.is_credit: bool = False
+
+        # variable gestion des tours
+        self.tour: int = 0
+        self.tour_joueur: int = 0
 
         logging.info("jeu initialisé")
 
@@ -107,7 +118,7 @@ class Game:
         screen.blit(menu, position)
 
     def play_set_nb_joueur(self: Game, screen: pygame.Surface) -> None:
-        '''affiche les boutton pour la création des joueurs et retourne le nombre de joueur.
+        '''affiche les bouttons pour la création des joueurs et retourne le nombre de joueurs.
 
         args:
             self (Game): Instance de la classe Game.
@@ -171,7 +182,7 @@ class Game:
         Returns:
             pygame.Surface: Surface pygame correspondant à la case dessinée.
         '''
-        color: tuple = (255, 255, 255, 75)
+        color: tuple = (255, 255, 255, 100)
         radius: int = 25 if largeur_case > 50 else 0
         surface: pygame.Surface = pygame.Surface(
             (largeur_case, hauteur_case), pygame.SRCALPHA)
@@ -200,19 +211,21 @@ class Game:
         self.plateau = pygame.Surface(
             (self.largeur_plateau, self.hauteur_plateau), pygame.SRCALPHA)
 
-        largeur_case = self.largeur_plateau/12
-        hauteur_case = self.hauteur_plateau/10
+        largeur_case: int = self.largeur_plateau/12
+        hauteur_case: int = self.hauteur_plateau/10
+        scale_vaisseau: int = int(
+            largeur_case) if largeur_case < hauteur_case else int(hauteur_case)
         case: pygame.surface.Surface = self.draw_case(
             largeur_case, hauteur_case)
         for i in range(12):
             for j in range(10):
+                self.plateau.blit(case, (i*largeur_case, j*hauteur_case))
                 for vaisseau in self.damier._vaisseaux:
-                    if vaisseau.pos == (i, j):
-                        pass
-                    else:
+                    if vaisseau.pos == [i, j]:
+                        vaisseau.image = pygame.transform.scale(
+                            vaisseau.image, (scale_vaisseau, scale_vaisseau))
                         self.plateau.blit(
-                            case, (i*largeur_case, j*hauteur_case))
-
+                            vaisseau.image, (i*largeur_case, j*hauteur_case))
         screen.blit(self.plateau, (10, 10))
 
     def play_credit(self, screen: pygame.Surface):
@@ -231,6 +244,37 @@ class Game:
         titre = pygame.transform.scale(
             titre, (largeur-15, (largeur-15)*0.11))
         menu.blit(titre, (7.5, 15))
+
+        # affichage du vaisseau du joueur courant
+        current_player: pygame.Surface = pygame.image.load(
+            self.damier._vaisseaux[self.tour_joueur]._url)
+        current_player = pygame.transform.scale(
+            current_player, (largeur, largeur))
+        menu.blit(
+            current_player, (0, hauteur/30))
+
+        # affichage point de vie
+        point_life: pygame.Surface = pygame.Surface(
+            (largeur, hauteur/30), pygame.SRCALPHA)
+        coeur: pygame.Surface = pygame.image.load(
+            "./assets/images/coeur.png")
+        coeur = pygame.transform.scale(
+            coeur, (int(hauteur/30), int(hauteur/30)))
+        mort: pygame.Surface = pygame.image.load(
+            "./assets/images/mort.png")
+        mort = pygame.transform.scale(mort, (int(hauteur/30), int(hauteur/30)))
+        if self.damier._vaisseaux[self.tour_joueur].pointlife <= 0:
+            point_life.blit(mort, (5, 0))
+        elif self.damier._vaisseaux[self.tour_joueur].pointlife <= 30:
+            point_life.blit(coeur, (5, 0))
+            pygame.draw.rect(point_life, (255, 0, 0, 200),
+                             pygame.Rect(largeur/6-5, 0, (5*largeur/6)*self.damier._vaisseaux[self.tour_joueur].pointlife/100, hauteur/30), border_radius=5)
+        else:
+            point_life.blit(coeur, (5, 0))
+            pygame.draw.rect(point_life, (0, 255, 0, 200),
+                             pygame.Rect(largeur/6-5, 0, (5*largeur/6)*self.damier._vaisseaux[self.tour_joueur].pointlife/100, hauteur/30), border_radius=5)
+
+        menu.blit(point_life, (0, 10*hauteur/30))
 
         screen.blit(menu, (self.largeur_plateau+20, 10))
 
