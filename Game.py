@@ -221,7 +221,7 @@ class Game:
             for j in range(10):
                 self.plateau.blit(case, (i*largeur_case, j*hauteur_case))
                 for vaisseau in self.damier._vaisseaux:
-                    if vaisseau.pos == [i, j]:
+                    if vaisseau.pos == (i, j):
                         vaisseau.image = pygame.transform.scale(
                             vaisseau.image, (scale_vaisseau, scale_vaisseau))
                         self.plateau.blit(
