@@ -7,7 +7,6 @@ import pygame
 
 # local library
 from Game import Game
-from Damier import Damier
 from Entite import Entite
 
 logging.config.fileConfig('./conf/log-config.ini')
@@ -55,6 +54,9 @@ if __name__ == '__main__':
                         game.is_played = False
                         game.is_credit = False
                         game.is_joueur_set = False
+                        game = Game(screen)
+                        move_history = game.damier._vaisseaux[game.tour_joueur].move_history
+
                     # espace pour fin de tour du joueur
                     if event.key == pygame.K_SPACE:
                         game.tour_joueur = game.tour_joueur + 1
@@ -67,6 +69,7 @@ if __name__ == '__main__':
                         game.damier._vaisseaux[game.tour_joueur].pointlife -= 10 if game.damier._vaisseaux[game.tour_joueur].pointlife > 0 else 0
                     if event.key == pygame.K_z:
                         game.damier._vaisseaux[game.tour_joueur].pointlife += 10 if game.damier._vaisseaux[game.tour_joueur].pointlife <= 90 else 0
+
                     # fleche pour deplacer le vaisseau
                     if event.key == pygame.K_RIGHT and len(move_history) < 3:
                         move_history.append(pos_joueur)
@@ -89,6 +92,13 @@ if __name__ == '__main__':
                         if move_history:
                             game.damier._vaisseaux[game.tour_joueur].pos = move_history.pop(
                             )
+        if game.is_credit:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN:
+                    game.is_credit = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

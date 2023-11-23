@@ -14,8 +14,13 @@ class Damier:
     def __init__(self) -> None:
         self._cases: list(list(dict)) = [[dict()
                                           for i in range(12)] for j in range(10)]
+
+        # liste des joueurs
         self._vaisseaux: list(Vaisseau) = []
-        self._ennemies: list(Ennemie) = []
+
+        # ajout d'enneemie sur le damier
+        troll: Ennemie = Ennemie("./assets/images/troll.png", "troll")
+        self._ennemies: list(Ennemie) = [troll]
 
         logging.info("damier initialisé")
 

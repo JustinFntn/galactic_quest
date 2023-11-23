@@ -46,6 +46,7 @@ class Game:
         self.is_played: bool = False
         self.is_joueur_set: bool = False
         self.is_credit: bool = False
+        self.is_combat: bool = False
 
         # variable gestion des tours
         self.tour: int = 0
@@ -122,6 +123,7 @@ class Game:
 
         args:
             self (Game): Instance de la classe Game.
+            screen (pygame.Surface): Surface sur laquelle le menu sera affiché.
 
         returns:
             int: nombre de joueur.
@@ -205,6 +207,11 @@ class Game:
     #     self.fenetre.blit(text, (x, y))
 
     def play_plateau(self, screen: pygame.Surface):
+        '''Affiche le plateau de jeu sur l'écran donné.
+
+        Args:
+            screen (pygame.Surface): La surface d'affichage.
+        '''
         screen.blit(self.background, (0, 0))
 
         # creation de la surface de jeu du plateau
@@ -213,7 +220,7 @@ class Game:
 
         largeur_case: int = self.largeur_plateau/12
         hauteur_case: int = self.hauteur_plateau/10
-        scale_vaisseau: int = int(
+        scale: int = int(
             largeur_case) if largeur_case < hauteur_case else int(hauteur_case)
         case: pygame.surface.Surface = self.draw_case(
             largeur_case, hauteur_case)
@@ -223,15 +230,27 @@ class Game:
                 for vaisseau in self.damier._vaisseaux:
                     if vaisseau.pos == (i, j):
                         vaisseau.image = pygame.transform.scale(
-                            vaisseau.image, (scale_vaisseau, scale_vaisseau))
+                            vaisseau.image, (scale, scale))
                         self.plateau.blit(
                             vaisseau.image, (i*largeur_case, j*hauteur_case))
+                for ennemie in self.damier._ennemies:
+                    if ennemie.pos == (i, j):
+                        ennemie.image = pygame.transform.scale(
+                            ennemie.image, (scale, scale))
+                        self.plateau.blit(
+                            ennemie.image, (i*largeur_case, j*hauteur_case))
         screen.blit(self.plateau, (10, 10))
 
     def play_credit(self, screen: pygame.Surface):
         self.play_plateau(screen)
 
     def play_menu_in_game(self, screen: pygame.Surface):
+        '''Affiche le menu de jeu dans la fenêtre de jeu.
+
+        Args:
+            screen (pygame.Surface): La surface de la fenêtre de jeu.
+        '''
+        # creation de la surface du menu
         largeur: int = self.largeur_fenetre-self.largeur_plateau-30
         hauteur: int = self.hauteur_plateau
 
@@ -240,6 +259,7 @@ class Game:
         pygame.draw.rect(menu, (100, 100, 100, 85), pygame.Rect(
             0, 0, largeur, hauteur), border_top_left_radius=20, border_top_right_radius=20)
 
+        # affichage du titre
         titre: pygame.Surface = pygame.image.load("./assets/images/titre.png")
         titre = pygame.transform.scale(
             titre, (largeur-15, (largeur-15)*0.11))
@@ -276,14 +296,21 @@ class Game:
 
         menu.blit(point_life, (0, 10*hauteur/30))
 
-        screen.blit(menu, (self.largeur_plateau+20, 10))
+        # afficher degat attaque
+        attack: pygame.Surface = pygame.Surface(
+            (largeur, hauteur/30), pygame.SRCALPHA)
+        blaster: pygame.Surface = pygame.image.load(
+            "./assets/images/blaster.png")
+        width, height = blaster.get_size()
+        blaster = pygame.transform.scale(
+            blaster, (int(hauteur/30)+20, (int(hauteur/30)+20)*height/width))
+        attack.blit(blaster, (5, 0))
 
-    def __str__(self: Game) -> str:
-        json: str = "{\n"
-        json += f"\t\"largeur_fenetre\": {self.largeur_fenetre},\n"
-        json += f"\t\"hauteur_fenetre\": {self.hauteur_fenetre},\n"
-        json += f"\t\"largeur_plateau\": {self.largeur_plateau},\n"
-        json += f"\t\"hauteur_plateau\": {self.hauteur_plateau},\n"
-        json += f"\t\"damier\": {self.damier}\n"
-        json += "}"
-        return json
+        font: pygame.font.Font = pygame.font.SysFont("comicsansms", 20, True)
+        text: pygame.Surface = font.render(
+            f'{self.damier._vaisseaux[self.tour_joueur].attack}', True, (255, 255, 255))
+        attack.blit(text, (2*largeur/6, 0))
+
+        menu.blit(attack, (0, 12*hauteur/30))
+
+        screen.blit(menu, (self.largeur_plateau+20, 10))
